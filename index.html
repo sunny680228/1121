@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>國高中教師專屬｜互動教學網頁提示詞產生器</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Google Fonts: Noto Sans TC 與 Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- 引入 FontAwesome 圖示庫 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans TC', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#2563eb',
+                            600: '#1d4ed8',
+                            700: '#1e40af',
+                            900: '#1e3a8a',
+                        },
+                        edtech: {
+                            teal: '#0d9488',
+                            amber: '#d97706',
+                            slate: '#f8fafc'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* 自訂捲軸樣式，提升閱讀體驗 */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        /* 卡片選取時的平滑過渡 */
+        .option-card {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .option-card:active {
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased selection:bg-brand-100 selection:text-brand-900">
+
+    <!-- 頂部導覽列 -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-teal-500 flex items-center justify-center text-white shadow-md">
+                    <i class="fa-solid fa-chalkboard-user text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-base sm:text-lg font-bold text-slate-900 tracking-tight">國高中教師專屬｜互動教學網頁提示詞產生器</h1>
+                    <p class="text-xs text-slate-500 hidden sm:block">108 課綱素養導向 • 嚴格緊扣課文文本 • 30 秒生成 AI 備課指令</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button type="button" onclick="loadExampleData()" class="text-xs sm:text-sm px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition flex items-center gap-1.5" title="填入國文科示範內容">
+                    <i class="fa-solid fa-wand-magic-sparkles text-brand-600"></i>
+                    <span>帶入範例試試</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主要雙欄工作區 -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+            
+            <!-- 左側：老師需求設定區 (佔 7 欄) -->
+            <div class="lg:col-span-7 space-y-6">
+                
+                <!-- 區塊 1 & 2：領域科目與適用年級 -->
+                <section class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-200/80">
+                    <div class="flex items-center gap-2.5 mb-4">
+                        <span class="w-7 h-7 rounded-lg bg-brand-100 text-brand-700 font-bold text-sm flex items-center justify-center">1</span>
+                        <h2 class="text-base sm:text-lg font-bold text-slate-900">教學基本設定</h2>
+                    </div>
+
+                    <!-- 1. 領域／科目 -->
+                    <div class="mb-5">
+                        <label class="block text-sm font-semibold text-slate-700 mb-2.5">
+                            領域／科目 <span class="text-rose-500">*</span>
+                        </label>
+                        <div id="subject-group" class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                            <!-- 由 JS 動態渲染按鈕 -->
+                        </div>
+                    </div>
+
+                    <!-- 2. 適用年級 -->
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2.5">
+                            適用年級（國中 7～9 年級 / 高中 10～12 年級） <span class="text-rose-500">*</span>
+                        </label>
+                        <div id="grade-group" class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                            <!-- 由 JS 動態渲染按鈕 -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 區塊 3 & 4：單元名稱與核心教學目標 -->
+                <section class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-200/80">
+                    <div class="flex items-center gap-2.5 mb-4">
+                        <span class="w-7 h-7 rounded-lg bg-brand-100 text-brand-700 font-bold text-sm flex items-center justify-center">2</span>
+                        <h2 class="text-base sm:text-lg font-bold text-slate-900">單元與教學目標</h2>
+                    </div>
+
+                    <!-- 3. 單元名稱 -->
+                    <div class="mb-5">
+                        <label for="unit-name" class="block text-sm font-semibold text-slate-700 mb-1.5">
+                            單元名稱 <span class="text-rose-500">*</span>
+                        </label>
+                        <input type="text" id="unit-name" 
+                            placeholder="例如：雅量、師說、一元一次方程式、三角函數、台灣的地形與氣候"
+                            class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition text-sm sm:text-base">
+                    </div>
+
+                    <!-- 4. 核心教學目標 -->
+                    <div>
+                        <div class="flex justify-between items-center mb-1.5">
+                            <label for="learning-goals" class="block text-sm font-semibold text-slate-700">
+                                核心教學目標 <span class="text-slate-400 font-normal text-xs">(建議條列 1~3 點學生需學會的能力)</span>
+                            </label>
+                        </div>
+                        <textarea id="learning-goals" rows="3"
+                            placeholder="例如：&#10;1. 能分辨作者對「雅量」的看法。&#10;2. 能舉出生活中展現包容的實例。"
+                            class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition text-sm sm:text-base leading-relaxed"></textarea>
+                    </div>
+                </section>
+
+                <!-- 區塊 5：網站互動架構類型（可多選） -->
+                <section class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-200/80">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2.5">
+                            <span class="w-7 h-7 rounded-lg bg-brand-100 text-brand-700 font-bold text-sm flex items-center justify-center">3</span>
+                            <h2 class="text-base sm:text-lg font-bold text-slate-900">網站互動架構類型</h2>
+                        </div>
+                        <span class="text-xs font-medium px-2.5 py-1 rounded-md bg-teal-50 text-teal-700 border border-teal-200">
+                            可複選（建議 1~3 項）
+                        </span>
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-500 mb-3.5">選擇希望學生在網頁中進行的互動學習任務：</p>
+
+                    <div id="interaction-group" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <!-- 由 JS 動態渲染可多選卡片 -->
+                    </div>
+                </section>
+
+                <!-- 區塊 6：網頁視覺與操作風格（單選） -->
+                <section class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-200/80">
+                    <div class="flex items-center gap-2.5 mb-4">
+                        <span class="w-7 h-7 rounded-lg bg-brand-100 text-brand-700 font-bold text-sm flex items-center justify-center">4</span>
+                        <h2 class="text-base sm:text-lg font-bold text-slate-900">網頁視覺與字體規格</h2>
+                    </div>
+
+                    <div class="mb-5">
+                        <label class="block text-sm font-semibold text-slate-700 mb-2.5">
+                            視覺主題風格
+                        </label>
+                        <div id="style-group" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <!-- 由 JS 動態渲染單選卡片 -->
+                        </div>
+                    </div>
+
+                    <!-- 目標網頁字體大小設定 -->
+                    <div class="pt-4 border-t border-slate-100">
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">
+                            目標教學網頁的字體大小設定
+                        </label>
+                        <div id="target-font-group" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                            <!-- 由 JS 動態渲染字體大小選項 -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 區塊 7：文本依據設定（必選切換開關 + 提醒機制） -->
+                <section class="bg-amber-50/90 rounded-2xl p-5 sm:p-6 shadow-sm border-2 border-amber-300">
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="flex items-start gap-3">
+                            <div class="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
+                                <i class="fa-solid fa-file-shield text-base"></i>
+                            </div>
+                            <div>
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <span class="text-xs font-bold px-2 py-0.5 rounded bg-amber-200 text-amber-900">核心防超綱設定</span>
+                                    <h2 class="text-base sm:text-lg font-bold text-slate-900">強制要求依據上傳文本</h2>
+                                </div>
+                                <p class="text-xs sm:text-sm text-slate-700 mt-2 leading-relaxed">
+                                    產生的提示詞將會自動加入<strong>「嚴格依據老師上傳的課文／講義／學習單文本製作，不隨意超綱擴充」</strong>的指令，並提醒老師在貼上提示詞時一併上傳檔案。
+                                </p>
+                            </div>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer shrink-0 mt-1" title="建議保持開啟以防止 AI 超綱">
+                            <input type="checkbox" id="strict-text-toggle" checked class="sr-only peer">
+                            <div class="w-12 h-7 bg-slate-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amber-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-amber-500"></div>
+                        </label>
+                    </div>
+                </section>
+
+            </div>
+
+            <!-- 右側：即時預覽與複製區 (佔 5 欄，桌面版 Sticky 固定) -->
+            <div class="lg:col-span-5 lg:sticky lg:top-22 space-y-4">
+                <div class="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden flex flex-col">
+                    
+                    <!-- 預覽區標頭 -->
+                    <div class="bg-slate-900 text-white px-5 py-3.5 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                            <h2 class="text-sm sm:text-base font-bold tracking-wide">即時組裝提示詞預覽</h2>
+                        </div>
+                        <button type="button" onclick="resetForm()" 
+                            class="text-xs px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-rose-600 text-slate-300 hover:text-white transition flex items-center gap-1.5 border border-slate-700 hover:border-rose-500">
+                            <i class="fa-solid fa-rotate-left"></i>
+                            <span>清空重填</span>
+                        </button>
+                    </div>
+
+                    <!-- 提示詞文字顯示框 -->
+                    <div class="p-4 sm:p-5 bg-slate-50/70">
+                        <div class="relative">
+                            <textarea id="prompt-output" readonly rows="17"
+                                class="w-full p-4 rounded-xl bg-white border border-slate-200 text-slate-800 font-mono text-xs sm:text-sm leading-relaxed focus:outline-none resize-y shadow-inner"></textarea>
+                            <div class="absolute bottom-3 right-3 text-[11px] text-slate-400 bg-white/90 px-2 py-0.5 rounded border border-slate-100 pointer-events-none">
+                                字數：<span id="char-count">0</span> 字
+                            </div>
+                        </div>
+
+                        <!-- 主要操作按鈕：一鍵複製提示詞 -->
+                        <div class="mt-4">
+                            <button type="button" id="copy-btn" onclick="copyPrompt()"
+                                class="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-brand-600 to-brand-500 hover:from-brand-700 hover:to-brand-600 text-white font-bold text-base shadow-lg shadow-brand-500/25 hover:shadow-brand-500/40 transition-all duration-200 flex items-center justify-center gap-2.5 active:scale-[0.99]">
+                                <i id="copy-icon" class="fa-regular fa-copy text-lg"></i>
+                                <span id="copy-text">一鍵複製提示詞</span>
+                            </button>
+                        </div>
+
+                        <!-- 貼心提醒標籤 -->
+                        <div class="mt-3.5 p-3.5 rounded-xl bg-blue-50 border border-blue-200/80 text-blue-900 text-xs sm:text-sm leading-relaxed flex items-start gap-2.5">
+                            <span class="text-base leading-none mt-0.5">💡</span>
+                            <p>
+                                複製後，請開啟 AI（如 <strong>Gemini</strong> / <strong>Claude</strong>），<strong class="text-brand-700 underline decoration-brand-300 decoration-2 underline-offset-2">先點擊「+」上傳您的課文或講義檔案</strong>，再貼上此提示詞送出！
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- 自訂 Toast 訊息框 (取代 alert) -->
+    <div id="toast-box" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <div class="bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl flex items-center gap-2.5 text-sm font-medium border border-slate-700">
+            <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400"></i>
+            <span id="toast-message">操作成功</span>
+        </div>
+    </div>
+
+    <script>
+        // ==================== 1. 資料定義 ====================
+        const SUBJECTS = [
+            "國語文", "英語文", "數學", 
+            "自然科學（生物/理化/物理/化學/地科）", "社會（歷史/地理/公民）", 
+            "科技（資訊/生活科技）", "藝術", "綜合活動", "健康與體育"
+        ];
+
+        const GRADES = [
+            "國中七年級（國一）",
+            "國中八年級（國二）",
+            "國中九年級（國三）",
+            "高中十年級（高一）",
+            "高中十一年級（高二）",
+            "高中十二年級（高三）",
+            "國中跨年級適用",
+            "高中跨年級適用"
+        ];
+
+        const INTERACTION_TYPES = [
+            {
+                id: "concept_explore",
+                title: "觀念圖解與互動探索",
+                shortDesc: "點擊重點卡片翻轉、滑桿調整參數看變化",
+                icon: "fa-solid fa-layer-group",
+                promptDetail: "觀念圖解與互動探索：設計可點擊翻轉的知識重點卡片、互動式比較表或參數調整滑桿，讓學生透過動手點擊主動歸納文本中的核心概念與因果變化。"
+            },
+            {
+                id: "escape_room",
+                title: "情境式解謎／密室逃脫",
+                shortDesc: "結合文本線索，答對關卡才能解鎖下一頁",
+                icon: "fa-solid fa-key",
+                promptDetail: "情境式解謎／密室逃脫：將課程包裝為任務闖關情境，學生必須仔細閱讀文本線索、輸入正確密碼或選擇正確推理，才能解鎖下一道關卡。"
+            },
+            {
+                id: "tiered_quiz",
+                title: "分層闖關測驗與即時回饋",
+                shortDesc: "基礎題到進階素養題，附帶錯題解析提示",
+                icon: "fa-solid fa-list-check",
+                promptDetail: "分層闖關測驗與即時回饋：設計由淺入深的題組（包含「基礎記憶理解題」與「進階素養應用題」），作答後立即顯示批改結果，答錯時提供對應的文本段落線索與解析引導。"
+            },
+            {
+                id: "mind_map",
+                title: "心智圖／結構化筆記整理",
+                shortDesc: "可點擊展開的階層架構，幫助學生抓出文章或觀念脈絡",
+                icon: "fa-solid fa-diagram-project",
+                promptDetail: "心智圖／結構化筆記整理：建立可點擊展開／收合的樹狀階層架構圖（或段落結構分析表），協助學生視覺化梳理文章脈絡、重點層次與知識關聯。"
+            },
+            {
+                id: "role_play",
+                title: "角色扮演與決策模擬",
+                shortDesc: "根據文本情境做出選擇，觀察不同決策的後果",
+                icon: "fa-solid fa-masks-theater",
+                promptDetail: "角色扮演與決策模擬：設計貼近文本背景的兩難或應用情境，讓學生代入角色做出決策選擇，並即時呈現該決策依據文本邏輯所產生的後續發展與省思。"
+            }
+        ];
+
+        const VISUAL_STYLES = [
+            {
+                id: "muji_note",
+                title: "簡約清新筆記風",
+                desc: "米白底色、護眼低彩度、無印良品風、適合閱讀與深度思考",
+                colorBadge: "bg-[#f7f5f0] border-[#d6d0c4] text-[#5c5549]",
+                promptDetail: "簡約清新筆記風（採用米白或暖灰護眼底色、低彩度莫蘭迪色系點綴、模擬無印良品筆記本的清晰排版與留白，適合長文閱讀與深度思考）"
+            },
+            {
+                id: "gamified",
+                title: "活潑遊戲化闖關風",
+                desc: "高對比色彩、進度條、徽章獎勵感、適合競賽與複習",
+                colorBadge: "bg-amber-100 border-amber-300 text-amber-800",
+                promptDetail: "活潑遊戲化闖關風（採用明亮高對比色彩、頂部設置學習進度條、過關積分與成就徽章獎勵特效，營造課堂競賽與複習的興奮感）"
+            },
+            {
+                id: "tech_lab",
+                title: "科技實驗室／數據風",
+                desc: "深色或冷色調、儀表板感、適合數理與資訊領域",
+                colorBadge: "bg-slate-800 border-cyan-500 text-cyan-300",
+                promptDetail: "科技實驗室／數據風（採用冷色調或深藍科技感配色、模組化儀表板卡片邊框、清晰的數據與邏輯呈現，適合數理探究與資訊科技領域）"
+            },
+            {
+                id: "storybook",
+                title: "故事繪本／情境沉浸風",
+                desc: "柔和插畫感配色、卡片導讀、適合文史與情意教學",
+                colorBadge: "bg-rose-50 border-rose-200 text-rose-800",
+                promptDetail: "故事繪本／情境沉浸風（採用柔和溫潤的插畫感配色、圓潤卡片與故事章節式導讀介面，強化情境代入感，適合文史與情意教學）"
+            }
+        ];
+
+        const TARGET_FONT_SIZES = [
+            {
+                id: "standard",
+                title: "標準舒適字級（16px～18px）",
+                desc: "適合學生使用個人平板、筆電或手機近距離閱讀與操作",
+                promptDetail: "標準舒適字級（內文基準 16px～18px，標題 24px 以上，行距寬鬆 1.6 倍以上，適合學生使用個人平板或電腦近距離閱讀）"
+            },
+            {
+                id: "classroom_large",
+                title: "教室投影大字級（20px～24px）",
+                desc: "專為教室大螢幕、電子白板投影設計，後排學生也看得清楚",
+                promptDetail: "教室投影大字級（內文基準放大至 20px～24px，重點標題 32px 以上，按鈕與選項加寬加大，確保教室大螢幕或電子白板投影時後排學生也能清晰閱讀）"
+            },
+            {
+                id: "extra_large",
+                title: "長文護眼特大字級（24px 以上）",
+                desc: "適合文言文精讀、長篇閱讀理解或視力友善無障礙需求",
+                promptDetail: "長文護眼特大字級（內文基準 24px 以上，採用高對比深淺配色與寬裕段落間距，減輕長篇課文或文言文閱讀時的視覺疲勞）"
+            },
+            {
+                id: "user_toggle",
+                title: "網頁內建「字級大小切換按鈕」",
+                desc: "讓老師與學生在網頁右上角一鍵切換「標準 / 大字 / 特大」",
+                promptDetail: "動態可調式字級（請在網頁頂部導覽列內建「字體大小切換按鈕：標準 / 大字 / 特大」，讓老師投影與學生自學時可隨時一鍵調整全站字級）"
+            }
+        ];
+
+        // ==================== 2. 狀態管理 ====================
+        const state = {
+            subject: "國語文",
+            grade: "國中七年級（國一）",
+            unitName: "",
+            learningGoals: "",
+            interactions: ["concept_explore", "tiered_quiz"], // 預設勾選兩項最實用的功能
+            visualStyle: "muji_note",
+            targetFontSize: "standard",
+            strictText: true
+        };
+
+        // ==================== 3. 初始化渲染 ====================
+        function initUI() {
+            renderSubjects();
+            renderGrades();
+            renderInteractions();
+            renderStyles();
+            renderTargetFontSizes();
+            bindInputEvents();
+            updatePrompt();
+        }
+
+        // 渲染領域科目按鈕
+        function renderSubjects() {
+            const container = document.getElementById("subject-group");
+            container.innerHTML = SUBJECTS.map(subj => {
+                const isSelected = state.subject === subj;
+                return `
+                    <button type="button" onclick="selectSubject('${subj}')"
+                        class="option-card text-left px-3 py-2.5 rounded-xl border text-xs sm:text-sm font-medium flex items-center justify-between ${
+                            isSelected 
+                            ? 'bg-brand-50 border-brand-500 text-brand-800 ring-1 ring-brand-500 shadow-sm font-bold' 
+                            : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300'
+                        }">
+                        <span class="truncate pr-1">${subj}</span>
+                        ${isSelected ? '<i class="fa-solid fa-circle-check text-brand-600 shrink-0"></i>' : ''}
+                    </button>
+                `;
+            }).join('');
+        }
+
+        // 渲染年級按鈕
+        function renderGrades() {
+            const container = document.getElementById("grade-group");
+            container.innerHTML = GRADES.map(grade => {
+                const isSelected = state.grade === grade;
+                return `
+                    <button type="button" onclick="selectGrade('${grade}')"
+                        class="option-card px-3 py-2.5 rounded-xl border text-xs sm:text-sm font-medium text-center ${
+                            isSelected 
+                            ? 'bg-brand-50 border-brand-500 text-brand-800 ring-1 ring-brand-500 shadow-sm font-bold' 
+                            : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300'
+                        }">
+                        ${grade}
+                    </button>
+                `;
+            }).join('');
+        }
+
+        // 渲染互動架構類型（可多選卡片）
+        function renderInteractions() {
+            const container = document.getElementById("interaction-group");
+            container.innerHTML = INTERACTION_TYPES.map(item => {
+                const isChecked = state.interactions.includes(item.id);
+                return `
+                    <div onclick="toggleInteraction('${item.id}')"
+                        class="option-card cursor-pointer p-3.5 rounded-xl border flex items-start gap-3 select-none ${
+                            isChecked 
+                            ? 'bg-teal-50/70 border-teal-500 ring-1 ring-teal-500 shadow-sm' 
+                            : 'bg-white border-slate-200 hover:bg-slate-50 hover:border-slate-300'
+                        }">
+                        <div class="mt-0.5 w-5 h-5 rounded flex items-center justify-center shrink-0 transition-colors ${
+                            isChecked ? 'bg-teal-600 text-white' : 'border-2 border-slate-300 bg-white'
+                        }">
+                            ${isChecked ? '<i class="fa-solid fa-check text-xs"></i>' : ''}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-1.5">
+                                <i class="${item.icon} text-xs ${isChecked ? 'text-teal-700' : 'text-slate-400'}"></i>
+                                <h3 class="text-sm font-bold ${isChecked ? 'text-teal-950' : 'text-slate-800'}">${item.title}</h3>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-1 leading-relaxed">${item.shortDesc}</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 渲染視覺風格（單選卡片）
+        function renderStyles() {
+            const container = document.getElementById("style-group");
+            container.innerHTML = VISUAL_STYLES.map(style => {
+                const isSelected = state.visualStyle === style.id;
+                return `
+                    <div onclick="selectStyle('${style.id}')"
+                        class="option-card cursor-pointer p-3.5 rounded-xl border flex flex-col justify-between select-none ${
+                            isSelected 
+                            ? 'bg-brand-50/70 border-brand-500 ring-1 ring-brand-500 shadow-sm' 
+                            : 'bg-white border-slate-200 hover:bg-slate-50 hover:border-slate-300'
+                        }">
+                        <div>
+                            <div class="flex items-center justify-between gap-2 mb-1.5">
+                                <span class="text-xs font-semibold px-2 py-0.5 rounded border ${style.colorBadge}">
+                                    ${style.title}
+                                </span>
+                                <div class="w-4 h-4 rounded-full border flex items-center justify-center ${
+                                    isSelected ? 'border-brand-600 bg-brand-600' : 'border-slate-300'
+                                }">
+                                    ${isSelected ? '<div class="w-1.5 h-1.5 rounded-full bg-white"></div>' : ''}
+                                </div>
+                            </div>
+                            <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">${style.desc}</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 渲染目標網頁字體大小（單選卡片）
+        function renderTargetFontSizes() {
+            const container = document.getElementById("target-font-group");
+            container.innerHTML = TARGET_FONT_SIZES.map(font => {
+                const isSelected = state.targetFontSize === font.id;
+                return `
+                    <div onclick="selectTargetFontSize('${font.id}')"
+                        class="option-card cursor-pointer p-3 rounded-xl border flex items-start gap-2.5 select-none ${
+                            isSelected 
+                            ? 'bg-brand-50/70 border-brand-500 ring-1 ring-brand-500 shadow-sm' 
+                            : 'bg-white border-slate-200 hover:bg-slate-50 hover:border-slate-300'
+                        }">
+                        <div class="mt-0.5 w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
+                            isSelected ? 'border-brand-600 bg-brand-600' : 'border-slate-300'
+                        }">
+                            ${isSelected ? '<div class="w-1.5 h-1.5 rounded-full bg-white"></div>' : ''}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="text-xs sm:text-sm font-bold ${isSelected ? 'text-brand-900' : 'text-slate-800'}">
+                                ${font.title}
+                            </div>
+                            <p class="text-xs text-slate-500 mt-0.5 leading-relaxed">${font.desc}</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 綁定文字輸入與切換開關事件
+        function bindInputEvents() {
+            const unitInput = document.getElementById("unit-name");
+            const goalsInput = document.getElementById("learning-goals");
+            const strictToggle = document.getElementById("strict-text-toggle");
+
+            if (unitInput) {
+                unitInput.addEventListener("input", (e) => {
+                    state.unitName = e.target.value;
+                    updatePrompt();
+                });
+            }
+
+            if (goalsInput) {
+                goalsInput.addEventListener("input", (e) => {
+                    state.learningGoals = e.target.value;
+                    updatePrompt();
+                });
+            }
+
+            if (strictToggle) {
+                strictToggle.addEventListener("change", (e) => {
+                    state.strictText = e.target.checked;
+                    if (!e.target.checked) {
+                        showToast("提醒：取消勾選可能導致 AI 自行補充超出該年級課本範圍的內容喔！", "warning");
+                    }
+                    updatePrompt();
+                });
+            }
+        }
+
+        // ==================== 4. 互動邏輯處理 ====================
+        function selectSubject(subj) {
+            state.subject = subj;
+            renderSubjects();
+            updatePrompt();
+        }
+
+        function selectGrade(grade) {
+            state.grade = grade;
+            renderGrades();
+            updatePrompt();
+        }
+
+        function toggleInteraction(id) {
+            const idx = state.interactions.indexOf(id);
+            if (idx > -1) {
+                state.interactions.splice(idx, 1);
+            } else {
+                state.interactions.push(id);
+            }
+            renderInteractions();
+            updatePrompt();
+        }
+
+        function selectStyle(id) {
+            state.visualStyle = id;
+            renderStyles();
+            updatePrompt();
+        }
+
+        function selectTargetFontSize(id) {
+            state.targetFontSize = id;
+            renderTargetFontSizes();
+            updatePrompt();
+        }
+
+        // ==================== 5. 核心提示詞組裝引擎 ====================
+        function updatePrompt() {
+            const isSeniorHigh = state.grade.includes("高中");
+            const stageLabel = isSeniorHigh ? "高中" : "國中";
+
+            const unitDisplay = state.unitName.trim() ? state.unitName.trim() : "（請填入單元名稱）";
+            const goalsDisplay = state.learningGoals.trim() 
+                ? "\n" + state.learningGoals.trim() 
+                : "（請依據上傳文本的核心概念，協助學生掌握本單元重點並能應用於生活與素養情境）";
+
+            // 組裝互動架構條列
+            let interactionListText = "";
+            if (state.interactions.length > 0) {
+                interactionListText = state.interactions.map((id, index) => {
+                    const found = INTERACTION_TYPES.find(item => item.id === id);
+                    return `${index + 1}. ${found.promptDetail}`;
+                }).join("\n");
+            } else {
+                interactionListText = `1. 觀念互動與隨堂測驗：請依據文本內容，設計適合${stageLabel}生的重點導讀卡片與即時回饋測驗題。`;
+            }
+
+            // 取得視覺風格與目標網頁字體大小詳細描述
+            const selectedStyleObj = VISUAL_STYLES.find(s => s.id === state.visualStyle);
+            const styleDisplay = selectedStyleObj ? selectedStyleObj.promptDetail : "";
+
+            const selectedFontObj = TARGET_FONT_SIZES.find(f => f.id === state.targetFontSize);
+            const fontDisplay = selectedFontObj ? selectedFontObj.promptDetail : "";
+
+            // 嚴格依據上傳文本區塊（根據開關決定強度）
+            const strictTextBlock = state.strictText 
+                ? `【核心指令：嚴格依據上傳文本（最高原則）】
+⚠️ 請務必先讀取我隨附上傳的「教學文本／課文／講義」檔案。網頁中的所有知識點、例題、題庫、對話與互動內容，必須 100% 緊扣該文本內容進行設計與轉化，嚴禁自行編造脫離文本的知識或超出${stageLabel}階段（${state.grade}）程度的重難點。若文本中有特定專有名詞或段落結構，請直接引用並轉化為互動元素。`
+                : `【教學內容依據】
+請參考我隨附上傳的教學文本或單元主題，設計符合台灣${stageLabel}階段（${state.grade}）學生程度、邏輯清晰且具素養導向的互動學習內容。`;
+
+            // 完整提示詞模板
+            const finalPrompt = `【角色設定】
+你現在是一位精通「${stageLabel}教學設計」與「前端網頁開發」的教育科技專家，熟悉台灣 108 課綱${stageLabel}階段（七至十二年級體系）的學生認知發展與素養導向教學。
+
+【教學基本資訊】
+- 適用科目與年級：${state.subject} / ${state.grade}
+- 單元名稱：${unitDisplay}
+- 核心教學目標：${goalsDisplay}
+
+${strictTextBlock}
+
+【網站架構與互動功能需求】
+請為本單元設計一個單頁式互動教學網頁（Single-file HTML，內含 CSS 與 JS），包含以下互動機制：
+${interactionListText}
+
+【視覺與使用者體驗規範】
+- 視覺風格：${styleDisplay}
+- 網頁字體規格：${fontDisplay}
+- 介面設計：按鈕明確、具備清楚的操作引導與即時回饋機制（答對鼓勵、答錯給予文本段落提示），並確保在電腦大螢幕投影與學生平板皆能流暢操作。
+
+【輸出要求】
+請直接產出完整的、可獨立執行的 HTML 程式碼（包含 Tailwind CSS CDN），並在最後簡短說明「老師在課堂上的操作步驟建議」。`;
+
+            const outputEl = document.getElementById("prompt-output");
+            outputEl.value = finalPrompt;
+            document.getElementById("char-count").textContent = finalPrompt.length;
+        }
+
+        // ==================== 6. 輔助功能（複製、清空、範例） ====================
+        function copyPrompt() {
+            const outputEl = document.getElementById("prompt-output");
+            outputEl.select();
+            outputEl.setSelectionRange(0, 99999); // 支援行動裝置
+
+            try {
+                // 使用相容性最高的 execCommand('copy') 確保在各種 iframe 環境都能成功複製
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    triggerCopySuccessUI();
+                } else if (navigator.clipboard) {
+                    navigator.clipboard.writeText(outputEl.value).then(() => {
+                        triggerCopySuccessUI();
+                    });
+                }
+            } catch (err) {
+                showToast("複製失敗，請手動全選文字複製", "error");
+            }
+            // 取消文字反白選取狀態，保持畫面整潔
+            window.getSelection().removeAllRanges();
+        }
+
+        function triggerCopySuccessUI() {
+            const btn = document.getElementById("copy-btn");
+            const icon = document.getElementById("copy-icon");
+            const text = document.getElementById("copy-text");
+
+            // 按鈕變色與文字回饋
+            btn.classList.remove("from-brand-600", "to-brand-500", "hover:from-brand-700", "hover:to-brand-600");
+            btn.classList.add("from-emerald-600", "to-teal-600");
+            icon.className = "fa-solid fa-check text-lg";
+            text.textContent = "已複製！快去貼給 AI 吧";
+
+            showToast("提示詞已成功複製到剪貼簿！記得先上傳檔案再貼上喔！", "success");
+
+            setTimeout(() => {
+                btn.classList.remove("from-emerald-600", "to-teal-600");
+                btn.classList.add("from-brand-600", "to-brand-500", "hover:from-brand-700", "hover:to-brand-600");
+                icon.className = "fa-regular fa-copy text-lg";
+                text.textContent = "一鍵複製提示詞";
+            }, 2500);
+        }
+
+        function resetForm() {
+            state.subject = "國語文";
+            state.grade = "國中七年級（國一）";
+            state.unitName = "";
+            state.learningGoals = "";
+            state.interactions = ["concept_explore", "tiered_quiz"];
+            state.visualStyle = "muji_note";
+            state.targetFontSize = "standard";
+            state.strictText = true;
+
+            document.getElementById("unit-name").value = "";
+            document.getElementById("learning-goals").value = "";
+            document.getElementById("strict-text-toggle").checked = true;
+
+            renderSubjects();
+            renderGrades();
+            renderInteractions();
+            renderStyles();
+            renderTargetFontSizes();
+            updatePrompt();
+
+            showToast("已清空所有欄位並恢復預設值", "info");
+        }
+
+        function loadExampleData() {
+            state.subject = "國語文";
+            state.grade = "國中七年級（國一）";
+            state.unitName = "雅量（宋晶宜）";
+            state.learningGoals = "1. 能從綠豆糕與衣料的對話實例中，分辨每個人審美觀與價值觀的差異。\n2. 能歸納作者對「雅量」的核心定義，並舉出生活中展現尊重與包容的實例。";
+            state.interactions = ["concept_explore", "mind_map", "tiered_quiz"];
+            state.visualStyle = "muji_note";
+            state.targetFontSize = "classroom_large";
+            state.strictText = true;
+
+            document.getElementById("unit-name").value = state.unitName;
+            document.getElementById("learning-goals").value = state.learningGoals;
+            document.getElementById("strict-text-toggle").checked = true;
+
+            renderSubjects();
+            renderGrades();
+            renderInteractions();
+            renderStyles();
+            renderTargetFontSizes();
+            updatePrompt();
+
+            showToast("已為您帶入「國一國文：雅量」教學範例！", "success");
+        }
+
+        let toastTimer = null;
+        function showToast(message, type = "success") {
+            const toastBox = document.getElementById("toast-box");
+            const toastIcon = document.getElementById("toast-icon");
+            const toastMsg = document.getElementById("toast-message");
+
+            toastMsg.textContent = message;
+
+            if (type === "success") {
+                toastIcon.className = "fa-solid fa-circle-check text-emerald-400";
+            } else if (type === "warning") {
+                toastIcon.className = "fa-solid fa-triangle-exclamation text-amber-400";
+            } else {
+                toastIcon.className = "fa-solid fa-circle-info text-blue-400";
+            }
+
+            toastBox.classList.remove("translate-y-20", "opacity-0");
+            toastBox.classList.add("translate-y-0", "opacity-100");
+
+            if (toastTimer) clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
+                toastBox.classList.remove("translate-y-0", "opacity-100");
+                toastBox.classList.add("translate-y-20", "opacity-0");
+            }, 3000);
+        }
+
+        // 頁面載入後啟動
+        window.addEventListener("DOMContentLoaded", initUI);
+    </script>
+</body>
+</html>
